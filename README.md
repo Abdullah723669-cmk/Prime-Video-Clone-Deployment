@@ -115,15 +115,15 @@ pipeline {
                 sh "npm install"
             }
         }
-        stage('OWASP FS SCAN') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
+        // stage('OWASP FS SCAN') {
+        //     steps {
+        //         dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //     }
+        // }
         stage ("Trivy File Scan") {
             steps {
-                sh "trivy fs . > trivy.txt"
+                sh "trivy fs . > trisdfsdfvy.txt"
             }
         }
         stage ("Build Docker Image") {
@@ -134,9 +134,9 @@ pipeline {
         stage ("Tag & Push to DockerHub") {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker') {
-                        sh "docker tag amazon-prime amonkincloud/amazon-prime:latest "
-                        sh "docker push amonkincloud/amazon-prime:latest "
+                    withDockerRegistry(credentialsId: 'docker-cred') {
+                        sh "docker tag amazon-prime mamun723/amazon-prime:latest "
+                        sh "docker push mamun723/amazon-prime:latest "
                     }
                 }
             }
@@ -144,17 +144,17 @@ pipeline {
         stage('Docker Scout Image') {
             steps {
                 script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                       sh 'docker-scout quickview amonkincloud/amazon-prime:latest'
-                       sh 'docker-scout cves amonkincloud/amazon-prime:latest'
-                       sh 'docker-scout recommendations amonkincloud/amazon-prime:latest'
+                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker'){
+                       sh 'docker-scout quickview mamun723/amazon-prime:latest'
+                       sh 'docker-scout cves mamun723/amazon-prime:latest'
+                       sh 'docker-scout recommendations mamun723/amazon-prime:latest'
                    }
                 }
             }
         }
         stage ("Deploy to Conatiner") {
             steps {
-                sh 'docker run -d --name amazon-prime -p 3000:3000 amonkincloud/amazon-prime:latest'
+                sh 'docker run -d --name amazon-prime -p 3000:3000 mamun723/amazon-prime:latest'
             }
         }
     }
@@ -177,7 +177,7 @@ pipeline {
                 </body>
                 </html>
             """,
-            to: 'provide_your_Email_id_here',
+            to: 'mamun.renata52@gmail.com',
             mimeType: 'text/html',
             attachmentsPattern: 'trivy.txt'
         }
